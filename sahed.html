@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Happy Birthday M size Medamji 🎂✨</title>
+
+  <!-- Google Fonts & Confetti CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ===================================================
+       1. VARIABLES & RESET
+       =================================================== */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #ffd3e2 0%, #e2d4f7 50%, #fbd5ec 100%);
+      --primary-pink: #ff6b9d;
+      --deep-purple: #4a284e;
+      --soft-purple: #79527f;
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 255, 255, 0.85);
+      --shadow-dreamy: 0 15px 35px rgba(138, 75, 148, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--deep-purple);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Ambient Floating Particle Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Main Card Stage Wrapper */
+    .app-container {
+      position: relative;
+      z-index: 2;
+      width: 92%;
+      max-width: 580px;
+      margin: 30px auto;
+    }
+
+    /* ===================================================
+       2. TOP BAR & CONTROLS
+       =================================================== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    /* Stage Steps Indicator (5 Stages) */
+    .stage-stepper {
+      display: flex;
+      gap: 7px;
+      background: rgba(255, 255, 255, 0.65);
+      padding: 6px 14px;
+      border-radius: 30px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .step-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #dfc1e5;
+      transition: all 0.4s ease;
+    }
+
+    .step-dot.active {
+      background: var(--primary-pink);
+      width: 22px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--primary-pink);
+    }
+
+    /* Music Toggle Pill */
+    .music-btn {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid var(--primary-pink);
+      padding: 8px 16px;
+      border-radius: 50px;
+      color: var(--deep-purple);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 107, 157, 0.25);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease;
+    }
+
+    .music-btn:active {
+      transform: scale(0.95);
+    }
+
+    .music-btn .disc {
+      display: inline-block;
+      font-size: 1.1rem;
+    }
+
+    .music-btn.playing .disc {
+      animation: spinTune 3s linear infinite;
+    }
+
+    @keyframes spinTune {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ===================================================
+       3. STAGE CARD COMMON STYLES
+       =================================================== */
+    .stage-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 2px solid var(--card-border);
+      border-radius: 32px;
+      padding: 34px 24px;
+      text-align: center;
+      box-shadow: var(--shadow-dreamy);
+      display: none;
+      opacity: 0;
+      transform: translateY(20px) scale(0.97);
+      transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .stage-card.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .stage-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--deep-purple);
+      margin-bottom: 6px;
+    }
+
+    .stage-subtitle {
+      font-size: 0.92rem;
+      color: var(--soft-purple);
+      margin-bottom: 22px;
+      font-weight: 500;
+    }
+
+    /* Primary CTA Button */
+    .btn-next {
+      background: linear-gradient(135deg, #ff6b9d 0%, #b862d2 100%);
+      color: #fff;
+      border: none;
+      padding: 13px 32px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255, 107, 157, 0.4);
+      transition: all 0.3s ease;
+      margin-top: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-next:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 14px 30px rgba(255, 107, 157, 0.55);
+    }
+
+    .btn-next:active {
+      transform: scale(0.96);
+    }
+
+    /* ===================================================
+       STAGE 1: 3D CAKE & CANDLE
+       =================================================== */
+    .cake-container {
+      position: relative;
+      width: 220px;
+      height: 200px;
+      margin: 10px auto 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+    }
+
+    .candle {
+      position: absolute;
+      top: 15px;
+      width: 14px;
+      height: 48px;
+      background: repeating-linear-gradient(45deg, #ffffff, #ffffff 6px, #ff8fa3 6px, #ff8fa3 12px);
+      border-radius: 6px 6px 0 0;
+      box-shadow: inset 0 -4px 6px rgba(0,0,0,0.1);
+      z-index: 5;
+    }
+
+    .flame {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 24px;
+      background: radial-gradient(ellipse at bottom, #fff5a5 20%, #ff9e00 65%, rgba(255, 60, 0, 0.8) 100%);
+      border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+      box-shadow: 0 0 18px #ffb703, 0 0 35px rgba(255, 158, 0, 0.7);
+      animation: flicker 0.8s infinite alternate ease-in-out;
+      transform-origin: bottom center;
+    }
+
+    @keyframes flicker {
+      0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+      50% { transform: translateX(-50%) scale(1.08) rotate(3deg); }
+      100% { transform: translateX(-50%) scale(0.94) rotate(-1deg); }
+    }
+
+    .smoke {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: rgba(180, 180, 180, 0.6);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .blown .flame { display: none; }
+    .blown .smoke { animation: puffSmoke 1.4s forwards ease-out; }
+
+    @keyframes puffSmoke {
+      0% { opacity: 0.8; transform: translate(-50%, 0) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -45px) scale(3.5); filter: blur(3px); }
+    }
+
+    .cake-top-tier {
+      width: 140px;
+      height: 52px;
+      background: linear-gradient(180deg, #ffb3c6 0%, #ff8fab 100%);
+      border-radius: 18px 18px 8px 8px;
+      position: relative;
+      box-shadow: 0 5px 12px rgba(255, 107, 157, 0.25);
+      z-index: 3;
+    }
+
+    .cake-top-tier::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 16px;
+      background: #ffffff;
+      border-radius: 18px 18px 10px 10px;
+      box-shadow: inset 0 -3px 4px rgba(255, 182, 193, 0.5);
+    }
+
+    .cake-bottom-tier {
+      width: 200px;
+      height: 65px;
+      background: linear-gradient(180deg, #dfb3e6 0%, #c78fd6 100%);
+      border-radius: 20px 20px 10px 10px;
+      position: relative;
+      margin-top: -6px;
+      box-shadow: 0 10px 20px rgba(114, 55, 126, 0.2);
+      z-index: 2;
+    }
+
+    .cake-bottom-tier::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 18px;
+      background: #ffffff;
+      border-radius: 20px 20px 12px 12px;
+      box-shadow: inset 0 -3px 4px rgba(223, 179, 230, 0.5);
+    }
+
+    .cake-plate {
+      width: 230px;
+      height: 14px;
+      background: #ffffff;
+      border-radius: 50px;
+      margin-top: -4px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+      z-index: 1;
+    }
+
+    .wish-glow-text {
+      display: none;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #ff3377;
+      text-shadow: 0 0 18px rgba(255, 51, 119, 0.4);
+      margin-top: 15px;
+      animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ===================================================
+       STAGE 2: MEMORY CARD GAME (4x3 = 12 Cards)
+       =================================================== */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 380px;
+      margin: 10px auto 16px;
+      perspective: 1000px;
+    }
+
+    @media (max-width: 420px) {
+      .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+    }
+
+    .memory-card {
+      aspect-ratio: 1;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+
+    .memory-card.flipped { transform: rotateY(180deg); }
+    .memory-card.matched {
+      transform: rotateY(180deg) scale(0.95);
+      cursor: default;
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%; height: 100%;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      box-shadow: 0 6px 14px rgba(114, 55, 126, 0.12);
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #ffffff 0%, #fed8e6 100%);
+      border: 2px dashed #f3a8c6;
+      font-size: 1.3rem;
+      color: var(--primary-pink);
+    }
+
+    .card-front {
+      background: #ffffff;
+      border: 2px solid var(--primary-pink);
+      transform: rotateY(180deg);
+      font-size: 2rem;
+    }
+
+    .memory-card.matched .card-front {
+      border-color: #70e000;
+      background: #f7fff0;
+    }
+
+    .match-banner {
+      display: none;
+      background: #ffffff;
+      border: 2px solid #b862d2;
+      border-radius: 18px;
+      padding: 14px 18px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--deep-purple);
+      margin-top: 14px;
+      animation: popIn 0.5s ease;
+    }
+
+    /* ===================================================
+       STAGE 3: LETTER OPENING & TYPING
+       =================================================== */
+    .envelope-box {
+      width: 100%;
+      max-width: 360px;
+      height: 220px;
+      margin: 10px auto 20px;
+      position: relative;
+      cursor: pointer;
+      perspective: 800px;
+    }
+
+    .envelope-base {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #f78ca0 0%, #fe9a8b 100%);
+      border-radius: 18px;
+      box-shadow: 0 15px 30px rgba(254, 154, 139, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .envelope-box:hover .envelope-base { transform: scale(1.03); }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 110px;
+      background: #f1728c;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top;
+      transition: transform 0.6s ease;
+      z-index: 4;
+    }
+
+    .envelope-seal {
+      position: absolute;
+      top: 95px; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px; height: 44px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 5;
+    }
+
+    .envelope-heart-stamp {
+      font-size: 3rem;
+      animation: pulseHeart 1.5s infinite;
+    }
+
+    @keyframes pulseHeart {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .letter-paper {
+      display: none;
+      background: #ffffff;
+      border: 2px solid #fed2e2;
+      border-radius: 20px;
+      padding: 26px 20px;
+      text-align: left;
+      font-family: 'Hind Siliguri', sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.95;
+      color: #381d39;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      max-height: 420px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 3px; height: 1.1em;
+      background: var(--primary-pink);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .skip-typing-btn {
+      display: none;
+      margin-top: 10px;
+      background: none;
+      border: none;
+      color: var(--soft-purple);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* ===================================================
+       STAGE 4: "CAN I GET A KISS & HUG?" GAME
+       =================================================== */
+    .kiss-hug-arena {
+      position: relative;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 15px auto 10px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 2px dashed #f5b2ce;
+      padding: 20px 15px;
+      overflow: hidden;
+    }
+
+    .asking-avatar {
+      font-size: 3.5rem;
+      margin-bottom: 8px;
+      animation: cuteWiggle 2s infinite ease-in-out;
+    }
+
+    @keyframes cuteWiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-8deg) scale(1.05); }
+      75% { transform: rotate(8deg) scale(1.05); }
+    }
+
+    .btn-choices-row {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin-top: 18px;
+      position: relative;
+      min-height: 60px;
+    }
+
+    .btn-yes {
+      background: linear-gradient(135deg, #ff477e, #ff758f);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 13px 26px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(255, 71, 126, 0.35);
+      transition: all 0.25s ease;
+      z-index: 2;
+    }
+
+    .btn-yes:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 28px rgba(255, 71, 126, 0.5);
+    }
+
+    .btn-no-dodge {
+      background: #ffffff;
+      color: #9d8189;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 22px;
+      border: 2px solid #ffcad4;
+      border-radius: 50px;
+      cursor: pointer;
+      position: absolute;
+      transition: left 0.18s ease-out, top 0.18s ease-out;
+      user-select: none;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    /* Granted Reaction Box */
+    .kiss-hug-granted {
+      display: none;
+      margin-top: 15px;
+      width: 100%;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .granted-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px 15px;
+      border: 2px solid #ff85a1;
+      box-shadow: 0 10px 25px rgba(255, 117, 143, 0.2);
+    }
+
+    .granted-card h3 {
+      font-size: 1.35rem;
+      color: #ff3377;
+      margin-bottom: 8px;
+    }
+
+    .tap-counter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 18px 0 10px;
+    }
+
+    .tap-action-btn {
+      background: #fff0f3;
+      border: 2px solid #ff758f;
+      border-radius: 40px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #d81159;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 117, 143, 0.2);
+      transition: transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tap-action-btn:active {
+      transform: scale(0.92);
+      background: #ffe5ec;
+    }
+
+    /* Floating On-Screen Stamp Marks (Kiss & Hug particles) */
+    .flying-stamp {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2.4rem;
+      z-index: 9999;
+      animation: floatUpFade 1.2s forwards ease-out;
+    }
+
+    @keyframes floatUpFade {
+      0% { opacity: 1; transform: scale(0.4) rotate(0deg); }
+      50% { transform: scale(1.3) rotate(-15deg); }
+      100% { opacity: 0; transform: translateY(-70px) scale(1) rotate(15deg); }
+    }
+
+    /* ===================================================
+       STAGE 5: FINAL WISH & SMILE
+       =================================================== */
+    .final-stage { padding: 40px 20px; }
+
+    .final-big-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(3rem, 10vw, 4.2rem);
+      line-height: 1.1;
+      color: #ff3377;
+      text-shadow: 0 0 20px rgba(255, 51, 119, 0.4), 0 0 40px rgba(255, 107, 157, 0.3);
+      margin-bottom: 12px;
+      animation: floatTitle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatTitle {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-8px) scale(1.02); }
+    }
+
+    .final-sub-wish {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--soft-purple);
+      margin-bottom: 25px;
+    }
+
+    .btn-smile {
+      background: linear-gradient(135deg, #ff477e, #b5179e);
+      color: #fff;
+      border: none;
+      padding: 16px 42px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(181, 23, 158, 0.4);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-smile:hover {
+      transform: translateY(-3px) scale(1.06);
+      box-shadow: 0 16px 36px rgba(181, 23, 158, 0.55);
+    }
+
+    .smile-response-card {
+      display: none;
+      margin-top: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid var(--primary-pink);
+      border-radius: 20px;
+      padding: 18px 22px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #7209b7;
+      box-shadow: 0 8px 24px rgba(255, 107, 157, 0.25);
+      animation: popIn 0.5s ease forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Floating Background Particles -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Lo-fi Piano Background Music Audio (Royalty-free) -->
+  <audio id="bg-audio" loop preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- Top Bar with Stepper & Music Controller -->
+    <div class="top-bar">
+      <div class="stage-stepper">
+        <div class="step-dot active" id="dot-1"></div>
+        <div class="step-dot" id="dot-2"></div>
+        <div class="step-dot" id="dot-3"></div>
+        <div class="step-dot" id="dot-4"></div>
+        <div class="step-dot" id="dot-5"></div>
+      </div>
+
+      <button class="music-btn" id="music-toggle-btn" onclick="toggleMusic()">
+        <span class="disc">🎵</span>
+        <span id="music-text">Music: Off</span>
+      </button>
+    </div>
+
+    <!-- ===================================================
+         STAGE 1: BIRTHDAY CAKE GAME
+         =================================================== -->
+    <div class="stage-card active" id="stage-1">
+      <h2 class="stage-title">Make a wish for Medamji! 🌸</h2>
+      <p class="stage-subtitle" id="candle-hint">Tap the candle to blow it ✨</p>
+
+      <div class="cake-container" id="cake-container" onclick="blowCandle()">
+        <div class="candle" id="candle">
+          <div class="flame" id="flame"></div>
+          <div class="smoke" id="smoke"></div>
+        </div>
+        <div class="cake-top-tier"></div>
+        <div class="cake-bottom-tier"></div>
+        <div class="cake-plate"></div>
+      </div>
+
+      <div class="wish-glow-text" id="wish-glow-text">
+        Happy Birthday M size Medamji 🎂✨
+      </div>
+
+      <button class="btn-next" id="btn-to-stage-2" style="display: none;" onclick="goToStage(2)">
+        Next Surprise ➔
+      </button>
+    </div>
+
+    <!-- ===================================================
+         STAGE 2: MEMORY CARD GAME (4x3 = 12 Cards)
+         =================================================== -->
+    <div class="stage-card" id="stage-2">
+      <h2 class="stage-title">Our Memories 💭</h2>
+      <p class="stage-subtitle">Match all 6 pairs of cute little memories!</p>
+
+      <div class="memory-grid" id="memory-grid"></div>
+
+      <div class="match-banner" id="match-banner">
+        💖 You have a sharp memory, just like you have a beautiful heart!
+      </div>
+
+      <button class="btn-next" id="btn-to-stage-3" style="display: none;" onclick="goToStage(3)">
+        Open My Letter 💌 ➔
+      </button>
+    </div>
+
+    <!-- ===================================================
+         STAGE 3: LETTER OPENING & TYPING
+         =================================================== -->
+    <div class="stage-card" id="stage-3">
+      <h2 class="stage-title">A Letter Only For You 💌</h2>
+      <p class="stage-subtitle" id="letter-status-subtitle">Tap the envelope to open and read</p>
+
+      <!-- Envelope -->
+      <div class="envelope-box" id="envelope-box" onclick="openLetter()">
+        <div class="envelope-base">
+          <div class="envelope-heart-stamp">💌</div>
+          <p style="color: #fff; font-weight: 700; margin-top: 10px; font-size: 0.95rem;">Click to Open</p>
+        </div>
+        <div class="envelope-flap" id="envelope-flap"></div>
+        <div class="envelope-seal" id="envelope-seal">🎀</div>
+      </div>
+
+      <!-- Letter Paper -->
+      <div class="letter-paper" id="letter-paper">
+        <span id="typed-content"></span><span class="typing-cursor" id="typing-cursor"></span>
+      </div>
+
+      <button class="skip-typing-btn" id="skip-typing-btn" onclick="skipTyping()">Show Full Letter</button>
+
+      <button class="btn-next" id="btn-to-stage-4" style="display: none;" onclick="goToStage(4)">
+        A Special Demand 🥺 ➔
+      </button>
+    </div>
+
+    <!-- ===================================================
+         STAGE 4: "CAN I GET A KISS & HUG?" GAME
+         =================================================== -->
+    <div class="stage-card" id="stage-4">
+      <h2 class="stage-title">A Tiny Birthday Demand! 🥺👉👈</h2>
+      <p class="stage-subtitle">Can I get a warm birthday hug & sweet kiss from Medamji?</p>
+
+      <div class="kiss-hug-arena" id="ask-arena">
+        <div class="asking-avatar">🥺❤️</div>
+
+        <div class="btn-choices-row" id="choice-buttons-area">
+          <button class="btn-yes" onclick="grantKissHug()">Yes, Take Both! 🫂💋</button>
+          <button class="btn-no-dodge" id="dodge-no-btn">No way! 😜</button>
+        </div>
+
+        <!-- Hidden until "Yes" is clicked -->
+        <div class="kiss-hug-granted" id="granted-view">
+          <div class="granted-card">
+            <h3>Yayyy! Received! 🫂💋✨</h3>
+            <p style="font-size: 0.92rem; color: var(--soft-purple); line-height: 1.6;">
+              10,000 warm forehead kisses & endless tight hugs delivered to my M size Medamji! Tap below to send more:
+            </p>
+
+            <div class="tap-counter-bar">
+              <button class="tap-action-btn" onclick="spawnStamp('hug')">
+                Hug 🤗 (<span id="hug-count">1</span>)
+              </button>
+              <button class="tap-action-btn" onclick="spawnStamp('kiss')">
+                Kiss 💋 (<span id="kiss-count">1</span>)
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-next" style="margin-top: 18px;" onclick="goToStage(5)">
+            The Grand Final Wish ➔
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         STAGE 5: FINAL WISH & SEND SMILE
+         =================================================== -->
+    <div class="stage-card final-stage" id="stage-5">
+      <h1 class="final-big-title">Happy Birthday M size Medamji</h1>
+      <p class="final-sub-wish">May your life be as radiant and gentle as the full moon 🌙✨</p>
+
+      <button class="btn-smile" id="btn-smile" onclick="sendSmile()">
+        Send a Smile 😊
+      </button>
+
+      <div class="smile-response-card" id="smile-response">
+        🌸 Your smile just made my entire world brighter! Stay blessed, happy, and forever mine. 🌙💖
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================
+       JAVASCRIPT LOGIC
+       =================================================== -->
+  <script>
+    /* --------------------------------------------------
+       1. SYNTHESIZED SOUND EFFECTS (Web Audio API)
+       -------------------------------------------------- */
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, type, duration, delay = 0) {
+      setTimeout(() => {
+        try {
+          const ctx = getAudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + duration);
+        } catch(e) {}
+      }, delay);
+    }
+
+    function soundCandleBlow() {
+      try {
+        const ctx = getAudioContext();
+        const bufferSize = ctx.sampleRate * 0.35;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        noise.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start();
+      } catch(e){}
+    }
+
+    function soundCardFlip() { playTone(520, 'sine', 0.1); }
+    function soundCardMatch() { 
+      playTone(523.25, 'triangle', 0.15, 0); 
+      playTone(659.25, 'triangle', 0.15, 120); 
+      playTone(783.99, 'triangle', 0.25, 240); 
+    }
+    function soundKiss() {
+      playTone(750, 'sine', 0.08, 0);
+      playTone(1100, 'sine', 0.12, 60);
+    }
+    function soundChime() {
+      [587.33, 659.25, 880, 1046.5].forEach((f, i) => playTone(f, 'sine', 0.3, i * 100));
+    }
+
+    /* --------------------------------------------------
+       2. BACKGROUND MUSIC TOGGLE
+       -------------------------------------------------- */
+    const bgAudio = document.getElementById('bg-audio');
+    const musicBtn = document.getElementById('music-toggle-btn');
+    const musicText = document.getElementById('music-text');
+    let isMusicPlaying = false;
+
+    function toggleMusic() {
+      getAudioContext();
+      if (isMusicPlaying) {
+        bgAudio.pause();
+        musicBtn.classList.remove('playing');
+        musicText.textContent = "Music: Off";
+        isMusicPlaying = false;
+      } else {
+        bgAudio.play().then(() => {
+          musicBtn.classList.add('playing');
+          musicText.textContent = "Music: Playing 💖";
+          isMusicPlaying = true;
+        }).catch(() => {});
+      }
+    }
+
+    // Try auto-play on first screen touch/click
+    window.addEventListener('click', function initAudio() {
+      if (!isMusicPlaying) {
+        bgAudio.play().then(() => {
+          musicBtn.classList.add('playing');
+          musicText.textContent = "Music: Playing 💖";
+          isMusicPlaying = true;
+        }).catch(() => {});
+      }
+    }, { once: true });
+
+    /* --------------------------------------------------
+       3. AMBIENT PARTICLES CANVAS
+       -------------------------------------------------- */
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particleSymbols = ['🌸', '💖', '✨', '⭐', '🌙', '🧁', '💋'];
+    class AmbientParticle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + 25;
+        this.size = Math.random() * 14 + 12;
+        this.speedY = Math.random() * 0.9 + 0.4;
+        this.speedX = (Math.random() - 0.5) * 0.7;
+        this.symbol = particleSymbols[Math.floor(Math.random() * particleSymbols.length)];
+        this.opacity = Math.random() * 0.55 + 0.25;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        if (this.y < -30) this.reset();
+      }
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.font = `${this.size}px sans-serif`;
+        ctx.fillText(this.symbol, this.x, this.y);
+      }
+    }
+
+    for (let i = 0; i < 22; i++) {
+      const p = new AmbientParticle();
+      p.y = Math.random() * canvas.height;
+      particles.push(p);
+    }
+
+    function animateAmbient() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateAmbient);
+    }
+    animateAmbient();
+
+    /* --------------------------------------------------
+       4. STAGE MANAGEMENT (5 STAGES)
+       -------------------------------------------------- */
+    let currentStage = 1;
+
+    function goToStage(stageNum) {
+      soundChime();
+      document.querySelectorAll('.stage-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.step-dot').forEach((d, idx) => {
+        d.classList.toggle('active', idx < stageNum);
+      });
+
+      const nextCard = document.getElementById(`stage-${stageNum}`);
+      if (nextCard) {
+        setTimeout(() => {
+          nextCard.classList.add('active');
+          if (stageNum === 2) initMemoryGame();
+          if (stageNum === 4) initKissHugStage();
+        }, 150);
+      }
+      currentStage = stageNum;
+    }
+
+    /* --------------------------------------------------
+       STAGE 1 LOGIC: BLOW CANDLE
+       -------------------------------------------------- */
+    let candleBlown = false;
+    function blowCandle() {
+      if (candleBlown) return;
+      candleBlown = true;
+      getAudioContext();
+      soundCandleBlow();
+
+      document.getElementById('cake-container').classList.add('blown');
+      document.getElementById('candle-hint').textContent = "Aww! Wish granted! 🌟";
+
+      confetti({
+        particleCount: 110,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#ff6b9d', '#ffd166', '#b862d2', '#ffffff']
+      });
+
+      setTimeout(() => {
+        document.getElementById('wish-glow-text').style.display = 'block';
+        document.getElementById('btn-to-stage-2').style.display = 'inline-flex';
+      }, 500);
+    }
+
+    /* --------------------------------------------------
+       STAGE 2 LOGIC: MEMORY CARD GAME (6 PAIRS)
+       -------------------------------------------------- */
+    const icons = ['🌙', '💖', '⭐', '🐱', '🎂', '💌'];
+    let cardDeck = [...icons, ...icons];
+    let flippedCards = [];
+    let matchedCount = 0;
+    let lockGrid = false;
+
+    function initMemoryGame() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+      cardDeck.sort(() => Math.random() - 0.5);
+      flippedCards = [];
+      matchedCount = 0;
+      lockGrid = false;
+
+      cardDeck.forEach((icon) => {
+        const card = document.createElement('div');
+        card.className = 'memory-card';
+        card.dataset.icon = icon;
+        card.innerHTML = `
+          <div class="card-face card-back">✨</div>
+          <div class="card-face card-front">${icon}</div>
+        `;
+        card.addEventListener('click', () => handleCardClick(card));
+        grid.appendChild(card);
+      });
+    }
+
+    function handleCardClick(card) {
+      if (lockGrid || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+      soundCardFlip();
+      card.classList.add('flipped');
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        checkMemoryMatch();
+      }
+    }
+
+    function checkMemoryMatch() {
+      lockGrid = true;
+      const [c1, c2] = flippedCards;
+      const isMatch = c1.dataset.icon === c2.dataset.icon;
+
+      if (isMatch) {
+        soundCardMatch();
+        c1.classList.add('matched');
+        c2.classList.add('matched');
+        matchedCount++;
+        flippedCards = [];
+        lockGrid = false;
+
+        if (matchedCount === 6) {
+          setTimeout(() => {
+            confetti({
+              particleCount: 120,
+              spread: 85,
+              origin: { y: 0.6 }
+            });
+            document.getElementById('match-banner').style.display = 'block';
+            document.getElementById('btn-to-stage-3').style.display = 'inline-flex';
+          }, 400);
+        }
+      } else {
+        setTimeout(() => {
+          c1.classList.remove('flipped');
+          c2.classList.remove('flipped');
+          flippedCards = [];
+          lockGrid = false;
+        }, 850);
+      }
+    }
+
+    /* --------------------------------------------------
+       STAGE 3 LOGIC: ENVELOPE OPENING & TYPING LETTER
+       -------------------------------------------------- */
+    const letterText = `আপনি,
+আজ ২৩শে অক্টোবর, আপনার জন্মদিন। এই দিনটার জন্যই হয়তো অপেক্ষা করছিলাম।
+আপনি জানেন? আপনি আমার লাইফের বেস্ট পার্সন। আপনাকে বোঝানোর মতো শব্দ আমার কাছে নেই। মনে হয় আপনি যেন আকাশ থেকে নেমে আসা চাঁদের টুকরা, আমার সব অন্ধকার রাতের একমাত্র আলো হয়ে এসেছেন।
+যখন মন খারাপের রাতগুলো অনেক বেশি ভারী হয়ে যায়, তখন আপনার একটা কথা, একটা হাসিই সব কষ্ট ভুলিয়ে দেয়। আপনাকে দেখলেই মনে হয়, এই পৃথিবীটা এখনো অনেক সুন্দর, বেঁচে থাকাটা এখনো অনেক মূল্যবান।
+আপনি আমার M size এর মানুষ। মানে, আমার মনের মাপে গড়া, আমার জন্যই তৈরি। একদম পারফেক্ট। আপনাকে ছাড়া আমার প্রতিটা মুহূর্ত অসম্পূর্ণ লাগে।
+আজকের এই দিনে আমার একটাই চাওয়া, আপনি সবসময় ভালো থাকুন, সুস্থ থাকুন, আর এভাবেই আমার পাশে থাকুন।
+শুভ জন্মদিন আমার সবচেয়ে প্রিয় মানুষ।`;
+
+    let letterOpened = false;
+    let typingInterval = null;
+
+    function openLetter() {
+      if (letterOpened) return;
+      letterOpened = true;
+      soundChime();
+
+      document.getElementById('envelope-flap').style.transform = 'rotateX(180deg)';
+      document.getElementById('envelope-seal').style.opacity = '0';
+
+      setTimeout(() => {
+        document.getElementById('envelope-box').style.display = 'none';
+        document.getElementById('letter-status-subtitle').textContent = "Words straight from my heart 🌸";
+        document.getElementById('letter-paper').style.display = 'block';
+        document.getElementById('skip-typing-btn').style.display = 'inline-block';
+        startTypingAnimation();
+      }, 550);
+    }
+
+    function startTypingAnimation() {
+      const target = document.getElementById('typed-content');
+      const cursor = document.getElementById('typing-cursor');
+      let i = 0;
+      target.textContent = '';
+
+      typingInterval = setInterval(() => {
+        if (i < letterText.length) {
+          target.textContent += letterText.charAt(i);
+          i++;
+        } else {
+          finishTyping();
+        }
+      }, 35);
+    }
+
+    function finishTyping() {
+      clearInterval(typingInterval);
+      document.getElementById('typed-content').textContent = letterText;
+      const cursor = document.getElementById('typing-cursor');
+      if (cursor) cursor.style.display = 'none';
+      document.getElementById('skip-typing-btn').style.display = 'none';
+      document.getElementById('btn-to-stage-4').style.display = 'inline-flex';
+
+      confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+    }
+
+    function skipTyping() { finishTyping(); }
+
+    /* --------------------------------------------------
+       STAGE 4 LOGIC: "CAN I GET A KISS & HUG?" GAME
+       -------------------------------------------------- */
+    let hugs = 1;
+    let kisses = 1;
+    const dodgeBtn = document.getElementById('dodge-no-btn');
+    const arena = document.getElementById('ask-arena');
+
+    function initKissHugStage() {
+      // Position the runaway "No" button nicely next to "Yes"
+      dodgeBtn.style.position = 'relative';
+      dodgeBtn.style.left = '0px';
+      dodgeBtn.style.top = '0px';
+    }
+
+    function dodgeNoButton(e) {
+      if (e) e.preventDefault();
+      dodgeBtn.style.position = 'absolute';
+      const arenaRect = arena.getBoundingClientRect();
+      const btnRect = dodgeBtn.getBoundingClientRect();
+
+      const maxX = arenaRect.width - btnRect.width - 20;
+      const maxY = arenaRect.height - btnRect.height - 20;
+
+      const randX = Math.max(10, Math.floor(Math.random() * maxX));
+      const randY = Math.max(10, Math.floor(Math.random() * maxY));
+
+      dodgeBtn.style.left = `${randX}px`;
+      dodgeBtn.style.top = `${randY}px`;
+
+      const wittyNotes = ["Can't say no! 😜", "Nope! Try again 🙈", "Too slow! 💕", "You must say yes! 🥰"];
+      dodgeBtn.textContent = wittyNotes[Math.floor(Math.random() * wittyNotes.length)];
+    }
+
+    dodgeBtn.addEventListener('mouseenter', dodgeNoButton);
+    dodgeBtn.addEventListener('touchstart', dodgeNoButton);
+
+    function grantKissHug() {
+      soundKiss();
+      confetti({
+        particleCount: 130,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#ff477e', '#ff758f', '#b862d2', '#ffffff']
+      });
+
+      document.getElementById('choice-buttons-area').style.display = 'none';
+      document.getElementById('granted-view').style.display = 'block';
+
+      // Burst 6 floating kiss & hug stamps initially
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+          spawnStamp(i % 2 === 0 ? 'kiss' : 'hug');
+        }, i * 180);
+      }
+    }
+
+    function spawnStamp(type) {
+      soundKiss();
+      const stamp = document.createElement('div');
+      stamp.className = 'flying-stamp';
+      stamp.textContent = type === 'kiss' ? '💋' : '🫂';
+
+      // Random position across the screen
+      const x = Math.random() * (window.innerWidth - 80) + 40;
+      const y = Math.random() * (window.innerHeight - 150) + 75;
+
+      stamp.style.left = `${x}px`;
+      stamp.style.top = `${y}px`;
+      document.body.appendChild(stamp);
+
+      if (type === 'kiss') {
+        kisses++;
+        document.getElementById('kiss-count').textContent = kisses;
+      } else {
+        hugs++;
+        document.getElementById('hug-count').textContent = hugs;
+      }
+
+      setTimeout(() => stamp.remove(), 1200);
+    }
+
+    /* --------------------------------------------------
+       STAGE 5 LOGIC: FINAL WISH & SMILE
+       -------------------------------------------------- */
+    function sendSmile() {
+      soundChime();
+      confetti({
+        particleCount: 160,
+        spread: 100,
+        origin: { y: 0.5 },
+        colors: ['#ff477e', '#ff70a6', '#ffd166', '#b5179e']
+      });
+
+      document.getElementById('smile-response').style.display = 'block';
+      const smileBtn = document.getElementById('btn-smile');
+      smileBtn.innerHTML = 'Smile Sent! 💖🥰';
+      smileBtn.style.pointerEvents = 'none';
+    }
+  </script>
+</body>
+</html>
